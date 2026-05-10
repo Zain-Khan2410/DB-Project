@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Leave Review{% endblock %}
+{% block content %}
+<div class="form-card">
+  <div style="text-align:center; margin-bottom:1.5rem;">
+    <div style="font-size:3rem;">⭐</div>
+    <h2 class="form-title" style="margin-bottom:0;">Leave a Review</h2>
+    <p style="color:var(--text-light);">{{ order.restaurant.name }} — Order #{{ order.pk }}</p>
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>Rating</label>
+      <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;" id="star-container">
+        {% for i in "12345" %}
+        <button type="button" class="star-btn" data-val="{{ forloop.counter }}"
+          style="background:none; border:none; font-size:2rem; cursor:pointer; transition:transform 0.1s; color:#D1D5DB;">★</button>
+        {% endfor %}
+      </div>
+      <input type="hidden" name="rating" id="rating-input" value="5"/>
+    </div>
+    <div class="form-group">
+      <label>Comment</label>
+      <textarea name="comment" class="form-control" rows="4" placeholder="Share your experience..."></textarea>
+    </div>
+    <button type="submit" class="btn-primary" style="width:100%; padding:0.8rem;">Submit Review</button>
+  </form>
+</div>
+
+{% block extra_js %}
+<script>
+const stars = document.querySelectorAll('.star-btn');
+let currentRating = 5;
+
+function setStars(val) {
+  stars.forEach((s, i) => {
+    s.style.color = i < val ? '#F6AD55' : '#D1D5DB';
+  });
+  document.getElementById('rating-input').value = val;
+  currentRating = val;
+}
+
+setStars(5);
+stars.forEach(btn => {
+  btn.addEventListener('mouseover', () => setStars(btn.dataset.val));
+  btn.addEventListener('click',     () => setStars(btn.dataset.val));
+  btn.addEventListener('mouseleave',() => setStars(currentRating));
+});
+</script>
+{% endblock %}
+{% endblock %}

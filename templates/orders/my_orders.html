@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}My Orders — FoodRush{% endblock %}
+{% block content %}
+<div style="max-width:900px; margin:0 auto;">
+  <h1 style="font-size:1.75rem; font-weight:700; margin-bottom:1.5rem;">📋 My Orders</h1>
+
+  {% if orders %}
+    <div style="display:flex; flex-direction:column; gap:1rem;">
+      {% for order in orders %}
+      <div class="card">
+        <div class="card-body" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
+          <div>
+            <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.4rem;">
+              <strong>Order #{{ order.pk }}</strong>
+              <span class="badge badge-{{ order.status }}">{{ order.get_status_display }}</span>
+            </div>
+            <p style="color:var(--text-light); font-size:0.875rem;">
+              🏪 {{ order.restaurant.name }} &nbsp;|&nbsp; {{ order.created_at|date:"d M Y, H:i" }}
+            </p>
+            <p style="font-size:0.875rem; margin-top:0.3rem;">
+              {{ order.items.count }} item{{ order.items.count|pluralize }} &nbsp;•&nbsp;
+              <strong style="color:var(--primary);">PKR {{ order.grand_total }}</strong>
+            </p>
+          </div>
+          <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+            <a href="{% url 'orders:order_detail' order.pk %}" class="btn-outline btn-sm">View Details</a>
+            {% if order.status == 'delivered' and not order.review %}
+              <a href="{% url 'orders:leave_review' order.pk %}" class="btn-primary btn-sm">⭐ Review</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📋</div>
+      <h3>No Orders Yet</h3>
+      <p>You haven't placed any orders. Browse restaurants and order something delicious!</p>
+      <a href="{% url 'restaurant:home' %}" class="btn-primary" style="margin-top:1rem;">Browse Restaurants</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

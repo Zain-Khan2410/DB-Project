@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}FoodRush — Order Food Online{% endblock %}
+{% block content %}
+
+<!-- Hero -->
+<div class="hero">
+  <h1>🍔 Hungry? We've Got You!</h1>
+  <p>Order from the best restaurants in your city. Fast delivery, great taste.</p>
+  <form method="get" action="{% url 'restaurant:home' %}">
+    <div class="search-bar">
+      <input type="text" name="q" value="{{ query }}" placeholder="Search restaurants or cuisines..."/>
+      <button type="submit"><i class="fas fa-search"></i></button>
+    </div>
+  </form>
+</div>
+
+<div style="max-width:1200px; margin:0 auto;">
+
+  <!-- Category Filter -->
+  {% if categories %}
+  <div class="category-filter">
+    <a href="{% url 'restaurant:home' %}" class="cat-btn {% if not selected_category %}active{% endif %}">🍽️ All</a>
+    {% for cat in categories %}
+      <a href="?category={{ cat.pk }}" class="cat-btn {% if selected_category == cat.pk|stringformat:'s' %}active{% endif %}">
+        {{ cat.icon }} {{ cat.name }}
+      </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Results -->
+  <div class="page-header">
+    <h2 class="section-title">
+      {% if query %}Results for "{{ query }}"{% else %}🔥 Featured Restaurants{% endif %}
+    </h2>
+    <span style="color:var(--text-light); font-size:0.9rem;">{{ restaurants|length }} restaurant{{ restaurants|length|pluralize }}</span>
+  </div>
+
+  {% if restaurants %}
+    <div class="grid grid-3">
+      {% for r in restaurants %}
+      <a href="{% url 'restaurant:detail' r.pk %}" class="card" style="display:block; color:inherit;">
+        {% if r.image %}
+          <img src="{{ r.image.url }}" alt="{{ r.name }}" class="card-img"/>
+        {% else %}
+          <div class="card-img-placeholder">🍽️</div>
+        {% endif %}
+        <div class="card-body">
+          <h3 class="card-title">{{ r.name }}</h3>
+          <p class="card-text">{{ r.description|truncatechars:70 }}</p>
+          <div class="restaurant-meta">
+            <span><i class="fas fa-star star"></i> {{ r.rating|floatformat:1 }}</span>
+            <span><i class="fas fa-clock"></i> {{ r.delivery_time }} min</span>
+            <span><i class="fas fa-motorcycle"></i> PKR 50 delivery</span>
+            {% if r.category %}<span>{{ r.category.icon }} {{ r.category.name }}</span>{% endif %}
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.8rem; color:var(--text-light);">Min order: PKR {{ r.min_order }}</span>
+            <span class="btn-primary btn-sm">Order Now →</span>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <h3>No Restaurants Found</h3>
+      <p>Try a different search or browse all restaurants.</p>
+      <a href="{% url 'restaurant:home' %}" class="btn-primary" style="margin-top:1rem;">Browse All</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}FoodRush 🍔{% endblock %}</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="{% url 'restaurant:home' %}" class="nav-logo">🍔 FoodRush</a>
+
+    <div class="nav-links">
+      <a href="{% url 'restaurant:home' %}"><i class="fas fa-home"></i> Home</a>
+
+      {% if user.is_authenticated %}
+        <a href="{% url 'orders:cart' %}" class="cart-btn">
+          <i class="fas fa-shopping-cart"></i> Cart
+          <span class="cart-badge" id="cart-badge">{{ request.session.cart_count|default:0 }}</span>
+        </a>
+        <a href="{% url 'orders:my_orders' %}"><i class="fas fa-list"></i> My Orders</a>
+
+        {% if user.is_owner or user.is_staff %}
+          <a href="{% url 'restaurant:owner_dashboard' %}"><i class="fas fa-store"></i> Dashboard</a>
+          <a href="{% url 'orders:owner_orders' %}"><i class="fas fa-receipt"></i> Manage Orders</a>
+        {% endif %}
+
+        <div class="nav-dropdown">
+          <button class="dropdown-btn">
+            <i class="fas fa-user-circle"></i> {{ user.username }} <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="dropdown-menu">
+            <a href="{% url 'accounts:profile' %}"><i class="fas fa-user"></i> Profile</a>
+            <a href="{% url 'accounts:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          </div>
+        </div>
+      {% else %}
+        <a href="{% url 'accounts:login' %}" class="btn-primary">Login</a>
+        <a href="{% url 'accounts:register' %}" class="btn-outline">Register</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<!-- MESSAGES -->
+{% if messages %}
+<div class="messages-container">
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+      {{ message }}
+      <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- PAGE CONTENT -->
+<main class="main-content">
+  {% block content %}{% endblock %}
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-brand">
+      <h3>🍔 FoodRush</h3>
+      <p>Delicious food delivered to your door.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Quick Links</h4>
+      <a href="{% url 'restaurant:home' %}">Home</a>
+      <a href="{% url 'accounts:login' %}">Login</a>
+      <a href="{% url 'accounts:register' %}">Register</a>
+    </div>
+    <div class="footer-contact">
+      <h4>Contact</h4>
+      <p><i class="fas fa-phone"></i> +92-300-1234567</p>
+      <p><i class="fas fa-envelope"></i> support@foodrush.pk</p>
+      <p><i class="fas fa-map-marker-alt"></i> Karachi, Pakistan</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2024 FoodRush. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="{% static 'js/main.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

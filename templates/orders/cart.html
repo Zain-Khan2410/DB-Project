@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Cart — FoodRush{% endblock %}
+{% block content %}
+<div style="max-width:1000px; margin:0 auto;">
+  <h1 style="font-size:1.75rem; font-weight:700; margin-bottom:1.5rem;">🛒 Your Cart</h1>
+
+  {% if items %}
+  <div class="cart-layout">
+    <!-- Items -->
+    <div class="table-card">
+      <table class="cart-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Price</th>
+            <th>Qty</th>
+            <th>Subtotal</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr id="cart-row-{{ item.id }}">
+            <td>
+              <div style="display:flex; align-items:center; gap:0.75rem;">
+                {% if item.image %}
+                  <img src="{{ item.image }}" alt="{{ item.name }}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;"/>
+                {% else %}
+                  <div style="width:50px; height:50px; background:#fde8d8; border-radius:8px; display:flex; align-items:center; justify-content:center;">🍴</div>
+                {% endif %}
+                <strong>{{ item.name }}</strong>
+              </div>
+            </td>
+            <td>PKR {{ item.price }}</td>
+            <td>
+              <div class="qty-control">
+                <button class="qty-btn" onclick="updateCart('{{ item.id }}', 'decrease')">−</button>
+                <span class="qty-num">{{ item.quantity }}</span>
+                <button class="qty-btn" onclick="updateCart('{{ item.id }}', 'increase')">+</button>
+              </div>
+            </td>
+            <td><strong>PKR {{ item.subtotal }}</strong></td>
+            <td>
+              <button class="btn-danger btn-sm" onclick="updateCart('{{ item.id }}', 'remove')">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Summary -->
+    <div class="order-summary">
+      <h3 style="font-size:1.15rem; font-weight:700; margin-bottom:1rem;">Order Summary</h3>
+      <div class="summary-row"><span>Subtotal</span><span>PKR {{ subtotal }}</span></div>
+      <div class="summary-row"><span>Delivery Fee</span><span>PKR {{ delivery_fee }}</span></div>
+      <div class="summary-row total"><span>Total</span><span>PKR {{ grand_total }}</span></div>
+      <a href="{% url 'orders:checkout' %}" class="btn-primary" style="display:block; text-align:center; margin-top:1.25rem; padding:0.85rem;">
+        Proceed to Checkout →
+      </a>
+      <a href="{% url 'restaurant:home' %}" style="display:block; text-align:center; margin-top:0.75rem; color:var(--text-light); font-size:0.875rem;">
+        + Add More Items
+      </a>
+    </div>
+  </div>
+
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">🛒</div>
+      <h3>Your Cart is Empty</h3>
+      <p>Browse restaurants and add some delicious items!</p>
+      <a href="{% url 'restaurant:home' %}" class="btn-primary" style="margin-top:1rem;">Browse Restaurants</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

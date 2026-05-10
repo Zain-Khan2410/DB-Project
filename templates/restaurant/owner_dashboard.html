@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Owner Dashboard — FoodRush{% endblock %}
+{% block content %}
+<div style="max-width:1100px; margin:0 auto;">
+  <div class="page-header">
+    <h1>🏪 My Restaurants</h1>
+    <a href="{% url 'restaurant:add_restaurant' %}" class="btn-primary"><i class="fas fa-plus"></i> Add Restaurant</a>
+  </div>
+
+  {% if restaurants %}
+    {% for r in restaurants %}
+    <div class="card" style="margin-bottom:1.5rem; padding:1.5rem;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <h2 style="font-size:1.3rem; font-weight:700;">{{ r.name }}</h2>
+          <p style="color:var(--text-light);">{{ r.address }} | {{ r.phone }}</p>
+          <p style="margin-top:0.3rem;">
+            <span class="badge badge-delivered">⭐ {{ r.rating }}</span>
+            <span style="margin-left:0.5rem; color:var(--text-light); font-size:0.875rem;">
+              {{ r.menu_items.count }} menu item{{ r.menu_items.count|pluralize }}
+            </span>
+          </p>
+        </div>
+        <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+          <a href="{% url 'restaurant:detail' r.pk %}" class="btn-outline btn-sm">👁️ View</a>
+          <a href="{% url 'restaurant:add_menu_item' r.pk %}" class="btn-primary btn-sm">+ Add Item</a>
+        </div>
+      </div>
+
+      <!-- Menu Items -->
+      {% if r.menu_items.all %}
+      <div style="margin-top:1.25rem; overflow-x:auto;">
+        <table class="data-table" style="border-radius:8px; overflow:hidden;">
+          <thead>
+            <tr>
+              <th>Item</th><th>Category</th><th>Price</th><th>Veg</th><th>Available</th><th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in r.menu_items.all %}
+            <tr>
+              <td><strong>{{ item.name }}</strong><br><span style="font-size:0.8rem; color:var(--text-light);">{{ item.description|truncatechars:40 }}</span></td>
+              <td>{{ item.category|default:"—" }}</td>
+              <td><strong>PKR {{ item.price }}</strong></td>
+              <td>{% if item.is_veg %}<span class="veg-badge">🌿 Yes</span>{% else %}No{% endif %}</td>
+              <td>{% if item.is_available %}<span class="badge badge-delivered">✅ Yes</span>{% else %}<span class="badge badge-cancelled">❌ No</span>{% endif %}</td>
+              <td>
+                <a href="{% url 'restaurant:delete_menu_item' item.pk %}"
+                   class="btn-danger btn-sm"
+                   onclick="return confirm('Delete this item?')">🗑️ Delete</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <p style="margin-top:1rem; color:var(--text-light);">No menu items yet. <a href="{% url 'restaurant:add_menu_item' r.pk %}" style="color:var(--primary);">Add your first item →</a></p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">🏪</div>
+      <h3>No Restaurants Yet</h3>
+      <p>Add your first restaurant to start receiving orders!</p>
+      <a href="{% url 'restaurant:add_restaurant' %}" class="btn-primary" style="margin-top:1rem;"><i class="fas fa-plus"></i> Add Restaurant</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
